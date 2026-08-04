@@ -20,6 +20,17 @@ class HardwareEventReceiver : BroadcastReceiver() {
                 eventType = "headset_wired"
                 eventDetails = if (state == 1) "connected" else "disconnected"
             }
+            "android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED",
+            "android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED" -> {
+             val state = intent.getIntExtra(android.bluetooth.BluetoothProfile.EXTRA_STATE, -1)
+             if (state == android.bluetooth.BluetoothProfile.STATE_CONNECTED) {
+                eventType = "bluetooth_audio_device"
+                eventDetails = "connected"
+            } else if (state == android.bluetooth.BluetoothProfile.STATE_DISCONNECTED) {
+                eventType = "bluetooth_audio_device"
+                eventDetails = "disconnected"
+            }
+        }
             "android.bluetooth.device.action.ACL_CONNECTED" -> {
                 eventType = "bluetooth_device"
                 eventDetails = "connected"
