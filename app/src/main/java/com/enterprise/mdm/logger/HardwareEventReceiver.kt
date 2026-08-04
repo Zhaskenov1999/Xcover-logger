@@ -3,56 +3,51 @@ package com.enterprise.mdm.logger
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 
 class HardwareEventReceiver : BroadcastReceiver() {
+
     override fun onReceive(context: Context, intent: Intent) {
-        val currentAction = intent.action ?: return
+        val action = intent.action ?: return
         
-        when (currentAction) {
-            Intent.ACTION_HEADSET_PLUG -> {
+        var eventType = "unknown"
+        var eventDetails = "none"
+
+        // Определяем, какое именно событие разбудило приложение
+        when (action) {
+            "android.intent.action.HEADSET_PLUG" -> {
+                // У проводных наушников есть параметр state: 1 = подключены, 0 = отключены
                 val state = intent.getIntExtra("state", -1)
-                val type = if (state == 1) "HEADSET_PLUGGED" else "HEADSET_UNPLUGGED"
-                saveAndSync(context, type, null, null)
+                eventType = "headset_wired"
+                eventDetails = if (state == 1) "connected" else "disconnected"
             }
-            Intent.ACTION_POWER_DISCONNECTED -> {
-                saveAndSync(context, "POWER_DISCONNECTED", null, null)
+            "android.bluetooth.device.action.ACL_CONNECTED" -> {
+                eventType = "bluetooth_device"
+                eventDetails = "connected"
             }
-            Intent.ACTION_BOOT_COMPLETED, "com.enterprise.mdm.ACTION_CHECK_LOCATION" -> {
-                val serviceIntent = Intent(context, EventSyncService::class.java).apply {
-                    this.action = "ACTION_FETCH_LOCATION"
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    context.startForegroundService(serviceIntent)
-                } else {
-                    context.startService(serviceIntent)
-                }
-                if (currentAction == Intent.ACTION_BOOT_COMPLETED) {
-                    EventSyncService.scheduleLocationAlarm(context)
-                }
+            "android.bluetooth.device.action.ACL_DISCONNECTED" -> {
+                eventType = "bluetooth_device"
+                eventDetails = "disconnected"
+            }
+            "android.intent.action.ACTION_POWER_DISCONNECTED" -> {
+                eventType = "power_cable"
+                eventDetails = "disconnected"
+            }
+            "android.intent.action.BOOT_COMPLETED" -> {
+                eventType = "system"
+                eventDetails = "device_rebooted"
             }
         }
-    }
 
-    private fun saveAndSync(context: Context, type: String, lat: Double?, lon: Double?) {
-        Thread {
-            val db = LocalDatabase.getInstance(context)
-            db.eventDao().insert(
-                LogEvent(
-                    mobile_id = Build.SERIAL,
-                    device_model = Build.MODEL,
-                    event_type = type,
-                    lat = lat,
-                    lon = lon,
-                    timestamp = System.currentTimeMillis()
-                )
-            )
-            val serviceIntent = Intent(context, EventSyncService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(serviceIntent)
-            } else {
-                context.startService(serviceIntent)
+        // Если событие распознано, запускаем наш сервис для отправки лога на сервер
+        if (eventType != "unknown") {
+            val serviceIntent = Intent(context, EventSyncService::class.java).apply {
+                putExtra("EVENT_TYPE", eventType)
+                putExtra("EVENT_DETAILS", eventDetails)
             }
-        }.start()
+            
+            // Запускаем фоновую службу (на Android 8+ рекомендуется использовать startForegroundService, 
+            // если приложение не в белом списке батареи, но так как у нас MDM - сработает и обычный)
+            context.startService(serviceIntent)
+        }
     }
 }
