@@ -60,7 +60,7 @@ class EventSyncService : Service() {
                 return@launch
             }
 
-            val serverUrl = "http://172.21.10.32:9200/metrics-emm_mdm_devices-default/_doc/"
+            val serverUrl = "http://192.168.1.8:8080/"
 
             try {
                 val url = URL(serverUrl)
