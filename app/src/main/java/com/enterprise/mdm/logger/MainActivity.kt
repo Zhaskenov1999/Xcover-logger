@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
             activityScope.launch(Dispatchers.IO) {
                 try {
-                    val serverUrl = "http://172.21.10.32:9200/metrics-emm_mdm_devices-default/_doc/"
+                    val serverUrl = "http://192.168.X.X:8080/"
                     val url = URL(serverUrl)
                     val conn = (url.openConnection() as HttpURLConnection).apply {
                         requestMethod = "POST"
