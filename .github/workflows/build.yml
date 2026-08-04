@@ -21,11 +21,9 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Install System Gradle
-      run: sudo apt-get update && sudo apt-get install -y gradle
-
-    - name: Generate Gradle Wrapper
-      run: gradle wrapper
+    - name: Download Gradle Wrapper files
+      run: |
+        gradle wrapper --gradle-version 8.4
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
