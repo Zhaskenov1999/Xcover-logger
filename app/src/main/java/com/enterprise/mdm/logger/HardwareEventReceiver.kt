@@ -7,9 +7,9 @@ import android.os.Build
 
 class HardwareEventReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val action = intent.action ?: return
+        val currentAction = intent.action ?: return
         
-        when (action) {
+        when (currentAction) {
             Intent.ACTION_HEADSET_PLUG -> {
                 val state = intent.getIntExtra("state", -1)
                 val type = if (state == 1) "HEADSET_PLUGGED" else "HEADSET_UNPLUGGED"
@@ -20,14 +20,14 @@ class HardwareEventReceiver : BroadcastReceiver() {
             }
             Intent.ACTION_BOOT_COMPLETED, "com.enterprise.mdm.ACTION_CHECK_LOCATION" -> {
                 val serviceIntent = Intent(context, EventSyncService::class.java).apply {
-                    action = "ACTION_FETCH_LOCATION"
+                    this.action = "ACTION_FETCH_LOCATION"
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     context.startForegroundService(serviceIntent)
                 } else {
                     context.startService(serviceIntent)
                 }
-                if (action == Intent.ACTION_BOOT_COMPLETED) {
+                if (currentAction == Intent.ACTION_BOOT_COMPLETED) {
                     EventSyncService.scheduleLocationAlarm(context)
                 }
             }
@@ -56,5 +56,3 @@ class HardwareEventReceiver : BroadcastReceiver() {
         }.start()
     }
 }
-
-
