@@ -16,12 +16,47 @@ class EventSyncService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Ловим данные от BroadcastReceiver (наушники, зарядка, Bluetooth)
+        val customEventType = intent?.getStringExtra("EVENT_TYPE")
+        val customEventDetails = intent?.getStringExtra("EVENT_DETAILS")
+
         if (intent?.action == "ACTION_FETCH_LOCATION") {
             fetchLocation()
+        } else if (customEventType != null) {
+            // Если пришло событие аппаратуры, сохраняем его и отправляем
+            saveHardwareEvent(customEventType, customEventDetails)
         } else {
+            // Обычная синхронизация по таймеру
             syncLogs()
         }
         return START_NOT_STICKY
+    }
+
+    private fun saveHardwareEvent(eventType: String, eventDetails: String?) {
+        serviceScope.launch {
+            val db = LocalDatabase.getInstance(applicationContext)
+            
+            // Формируем понятный статус, например: "bluetooth_device_connected"
+            val finalEventType = if (eventDetails != null && eventDetails != "none") {
+                "${eventType}_${eventDetails}"
+            } else {
+                eventType
+            }
+
+            // Записываем событие в локальную базу данных
+            db.eventDao().insert(
+                LogEvent(
+                    mobile_id = Build.SERIAL,
+                    device_model = Build.MODEL,
+                    event_type = finalEventType,
+                    lat = null, // Для наушников координаты не нужны
+                    lon = null,
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+            // Сразу инициируем отправку накопленных логов на сервер
+            syncLogs()
+        }
     }
 
     private fun fetchLocation() {
@@ -60,6 +95,7 @@ class EventSyncService : Service() {
                 return@launch
             }
 
+            // Ваш временный локальный IP для тестов
             val serverUrl = "http://192.168.1.8:8080/"
 
             try {
@@ -99,7 +135,7 @@ class EventSyncService : Service() {
                     conn.disconnect()
                 }
             } catch (e: Exception) {
-                // Ошибка сети — данные ждут в базе
+                // Ошибка сети — данные ждут в базе до следующей синхронизации
             } finally {
                 stopSelf()
             }
