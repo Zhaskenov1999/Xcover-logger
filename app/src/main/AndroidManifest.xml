@@ -1,24 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.enterprise.mdm.logger">
 
+    <!-- Разрешения для интернета и проверки сети -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- Разрешение для автоматического запуска после перезагрузки устройства -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
+    <!-- Разрешения для геолокации (включая работу в фоне) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    
+    <!-- Разрешение для работы таймера отправки логов -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    
+    <!-- Разрешения для Bluetooth (необходимо для Android 12+) -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    
+    <!-- Разрешение для чтения оператора SIM-карты -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="false"
         android:label="MDM Logger"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="true" 
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <!-- ВНИМАНИЕ: usesCleartextTraffic="true" крайне важен! 
+             Без него Android заблокирует отправку на http:// (ваш локальный IP) -->
 
+        <!-- Главный экран приложения -->
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -28,24 +43,28 @@
             </intent-filter>
         </activity>
 
+        <!-- Наш слушатель системных событий -->
         <receiver
             android:name=".HardwareEventReceiver"
             android:enabled="true"
             android:exported="true">
-        <intent-filter>
-            <!-- Старые события -->
-            <action android:name="android.intent.action.HEADSET_PLUG" />
-            <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-            <action android:name="android.intent.action.BOOT_COMPLETED" />
-            <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
-            <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
-    
-            <!-- НОВЫЕ: Специально для Bluetooth наушников и гарнитур -->
-           <action android:name="android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED" />
-           <action android:name="android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED" />
-        </intent-filter>
+            <intent-filter>
+                <!-- События питания и перезагрузки -->
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                
+                <!-- События Bluetooth (наушники, часы и гарнитуры) -->
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+                <action android:name="android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED" />
+                <action android:name="android.bluetooth.headset.profile.action.CONNECTION_STATE_CHANGED" />
+                
+                <!-- Оставляем HEADSET_PLUG для старых версий Android (новые версии перехватят это в MainActivity) -->
+                <action android:name="android.intent.action.HEADSET_PLUG" />
+            </intent-filter>
         </receiver>
 
+        <!-- Наш фоновый сервис для сбора данных и отправки JSON на сервер -->
         <service
             android:name=".EventSyncService"
             android:exported="false"
