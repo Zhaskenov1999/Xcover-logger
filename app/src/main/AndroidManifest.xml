@@ -16,21 +16,12 @@
     <!-- Разрешение для работы таймера отправки логов -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     
-    <!-- Разрешения для Bluetooth (необходимо для Android 12+) -->
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    
     <!-- Разрешение для чтения оператора SIM-карты -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-    <!-- Для старых версий Android (до API 31) -->
+    <!-- Разрешения для Bluetooth (объединенные и без дубликатов) -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
-
-    <!-- Для Android 12+ (API 31+) обязательно для получения имени устройства -->
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-
-    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <application
@@ -78,7 +69,10 @@
         <service
             android:name=".EventSyncService"
             android:exported="false"
-            android:foregroundServiceType="location|dataSync"
+            android:foregroundServiceType="location|dataSync" />
+
+        <!-- Наш НОВЫЙ фоновый сервис для телеметрии Bluetooth -->
+        <service
             android:name=".TelemetryService"
             android:enabled="true"
             android:exported="false" />
