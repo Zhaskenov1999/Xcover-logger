@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.enterprise.mdm.logger">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Разрешения для интернета и проверки сети -->
     <uses-permission android:name="android.permission.INTERNET" />
