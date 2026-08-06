@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
             activityScope.launch(Dispatchers.IO) {
                 try {
-                    val serverUrl = "http://192.168.1.8:8080/"
+                    val serverUrl = "http://192.168.1.35:8080/"
                     val url = URL(serverUrl)
                     val conn = (url.openConnection() as HttpURLConnection).apply {
                         requestMethod = "POST"
