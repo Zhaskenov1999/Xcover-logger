@@ -1,10 +1,12 @@
 package com.enterprise.mdm.logger
 
+import android.content.Intent // <-- Добавлен импорт для Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.enterprise.mdm.TelemetryService // <-- Добавлен импорт твоего сервиса
 import kotlinx.coroutines.*
 import java.net.HttpURLConnection
 import java.net.URL
@@ -15,6 +17,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // =====================================================================
+        // ДОБАВЛЕННЫЙ КОД: Запуск фонового сервиса сбора Bluetooth-телеметрии
+        // =====================================================================
+        val serviceIntent = Intent(this, TelemetryService::class.java)
+        startService(serviceIntent)
+        // =====================================================================
 
         val tvStatus = findViewById<TextView>(R.id.tvStatus)
         val tvCount = findViewById<TextView>(R.id.tvCount)
