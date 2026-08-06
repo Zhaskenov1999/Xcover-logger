@@ -134,7 +134,7 @@ class EventSyncService : Service() {
                 return@launch
             }
 
-            val serverUrl = "http://192.168.1.8:8080/"
+            val serverUrl = "http://192.168.1.35:8080/"
 
             try {
                 val url = URL(serverUrl)
