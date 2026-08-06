@@ -3,7 +3,7 @@ package com.enterprise.mdm.logger
 import android.app.Application
 import androidx.work.Constraints
 import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 
@@ -14,16 +14,17 @@ class MdmApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         
-        // 1. Запускаем мониторинг наушников
+        // Запуск мониторинга наушников
         headsetMonitor = HeadsetMonitor(this)
         headsetMonitor.startMonitoring()
 
-        // 2. Запускаем периодический сбор телеметрии (каждые 15 минут)
+        // Запускаем первый тестовый сбор через 2 минуты
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED) // Только при наличии сети
+            .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val telemetryRequest = PeriodicWorkRequestBuilder<TelemetryWorker>(, TimeUnit.MINUTES)
+        val telemetryRequest = OneTimeWorkRequestBuilder<TelemetryWorker>()
+            .setInitialDelay(2, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 
