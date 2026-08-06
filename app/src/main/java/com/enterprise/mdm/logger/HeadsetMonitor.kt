@@ -1,4 +1,4 @@
-package com.example.myapp // Замените на ваш актуальный пакет
+package com.enterprise.mdm.logger
 
 import android.content.Context
 import android.media.AudioDeviceCallback
