@@ -42,7 +42,7 @@ class HeadsetMonitor(private val context: Context) {
         thread {
             try {
                 // ЗАМЕНИТЕ НА IP ВАШЕГО КОМПЬЮТЕРА И ПОРТ PYTHON-СЕРВЕРА
-                val url = URL("http://192.168.1.50:5000/log") 
+                val url = URL("http://192.168.1.35:8080/log") 
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = "POST"
                 connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
