@@ -1,4 +1,4 @@
-package com.enterprise.mdm.logger // Укажите ваш пакет
+package com.enterprise.mdm.logger
 
 import android.app.Application
 
@@ -8,8 +8,6 @@ class MdmApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        
-        // Запускаем мониторинг наушников сразу при старте приложения/сервиса
         headsetMonitor = HeadsetMonitor(this)
         headsetMonitor.startMonitoring()
     }
