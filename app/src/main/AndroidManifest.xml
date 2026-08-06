@@ -23,6 +23,13 @@
     <!-- Разрешение для чтения оператора SIM-карты -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <!-- Для старых версий Android (до API 31) -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+
+    <!-- Для Android 12+ (API 31+) обязательно для получения имени устройства -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
     <application
         android:name=".MdmApplication"
         android:allowBackup="false"
